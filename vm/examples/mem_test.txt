@@ -1,0 +1,18 @@
+.section
+    @int i_max 40
+.code
+main:
+    push_i $0
+    main_loop:
+        dup
+        load_const #i_max
+        lt
+        jmp_z &end
+        create_struct $2
+        pop
+        push_i $1
+        add_i
+        jmp &main_loop
+
+    end:
+        hlt

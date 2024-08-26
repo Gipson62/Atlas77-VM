@@ -16,6 +16,7 @@ use crate::{
 
 pub type CallBack = fn(vm_state::VMState) -> Result<VMData, ()>;
 
+#[derive(Debug)]
 pub struct VM {
     pub stack: Stack,
     pub object_map: Memory,

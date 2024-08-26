@@ -1,7 +1,5 @@
 use vm::instruction::compiler::parser::Parser;
 
-use vm::memory::vm_data::VMData;
-use vm::runtime::vm_state::VMState;
 use vm::runtime::VM;
 
 fn main() {
@@ -23,7 +21,7 @@ fn main() {
                         println!("Ok Parser: {:?}", tmp.elapsed());
                         let tmp = std::time::Instant::now();
                         let mut vm = VM::new(0, code.constants);
-                        vm.add_extern_call(fib_extern).execute(code.ins.as_slice());
+                        vm.execute(code.ins.as_slice());
                         println!("Ok Excution: {:?}", tmp.elapsed())
                     }
                     Err(e) => {
@@ -38,16 +36,4 @@ fn main() {
     } else {
         println!("Error2")
     }
-}
-
-pub fn fib_extern(vm_state: VMState) -> Result<VMData, ()> {
-    fn fib(n: i64) -> i64 {
-        if n < 2 {
-            n
-        } else {
-            fib(n - 1) + fib(n - 2)
-        }
-    }
-    let res = fib(vm_state.stack.pop().expect("Stack Underflow").as_i64());
-    Ok(VMData::new_i64(res))
 }

@@ -1,8 +1,10 @@
 use crate::memory::vm_data::VMData;
 
+#[derive(Debug)]
 pub struct Memory {
     mem: Vec<Object>,
     pub(crate) free: ObjectIndex,
+    memory_pressure: usize,
 }
 
 #[repr(C)]
@@ -22,6 +24,16 @@ impl std::fmt::Display for ObjectIndex {
     }
 }
 
+impl std::fmt::Display for Memory {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ObjectMap: [{}]",
+            self.mem.iter().map(|obj| {
+                obj.to_string()
+            }).collect::<String>()
+        )
+    }
+}
+
 impl Memory {
     pub(crate) fn new(space: usize) -> Self {
         Self {
@@ -31,26 +43,51 @@ impl Memory {
                     next: ObjectIndex::new(((x + 1) % space) as u64),
                 })
                 .collect(),
+            memory_pressure: usize::default(),
         }
     }
 
     // Need to add a way to increase `mem` size if we out of memory
     // And a way to clean it when there's too much memory (basically shrink and grow)
     pub(crate) fn put(&mut self, object: Object) -> Result<ObjectIndex, Object> {
-        let idx = self.free;
-        let v = self.get_mut(self.free);
-        let repl = std::mem::replace(v, object);
+        if let Object::Free { next: _ } = self.get(self.free) {
+            let idx = self.free;
+            let v = self.get_mut(self.free);
+            let repl = std::mem::replace(v, object);
 
-        match repl {
-            Object::Free { next } => {
-                self.free = next;
-                Ok(idx)
+            match repl {
+                Object::Free { next } => {
+                    self.free = next;
+                    self.memory_pressure += 1;
+                    Ok(idx)
+                }
+                _ => {
+                    let obj = std::mem::replace(v, repl);
+                    Err(obj)
+                }
             }
-            _ => {
-                let obj = std::mem::replace(v, repl);
-                Err(obj)
-            }
+        } else {
+            self.grow();
+            self.put(object)
         }
+    }
+
+    fn grow(&mut self) {
+        let current_size = self.mem.len();
+        let new_size = current_size + (current_size / 10);
+
+        self.mem.reserve(new_size - current_size);
+        for i in current_size..new_size {
+            self.mem.push(Object::Free {
+                next: ObjectIndex {
+                    idx: (i + 1) as u64,
+                },
+            })
+        }
+
+        self.mem[new_size - 1] = Object::Free { next: self.free };
+
+        self.free = ObjectIndex::new(current_size as u64);
     }
 
     #[inline(always)]
@@ -72,6 +109,20 @@ impl Memory {
     pub(crate) fn raw_mut(&mut self) -> &mut [Object] {
         &mut self.mem
     }
+
+    #[inline(always)]
+    /// Return None if the ptr points to a free block and return the pointed object if not
+    pub(crate) fn free_struct(&mut self, index: ObjectIndex) -> Option<Object> {
+        if let &Object::Free { next: _ } = self.get(index) {
+            None
+        } else {
+            let new_free = Object::Free { next: self.free };
+            let v = self.get_mut(index);
+            let repl = std::mem::replace(v, new_free);
+            self.free = index;
+            Some(repl)
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -79,6 +130,28 @@ pub enum Object {
     String(String),
     Structure(Structure),
     Free { next: ObjectIndex },
+}
+
+impl std::fmt::Display for Object {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match self {
+            Object::String(s) => {
+                format!("String: {}", s)
+            },
+            Object::Structure(s) => {
+                format!("Structure: {{ {} }}", {
+                    let mut str_ = String::new();
+                    s.fields.iter().for_each(|f| {
+                        str_.push_str(&f.to_string())
+                    });
+                    str_
+                })
+            }
+            Object::Free { next } => {
+                format!("Free: {}", next)
+            }
+        })
+    }
 }
 
 impl Object {
