@@ -22,9 +22,8 @@ fn main() {
                     Ok(code) => {
                         println!("Ok Parser: {:?}", tmp.elapsed());
                         let tmp = std::time::Instant::now();
-                        let mut vm = VM::new();
-                        vm.add_extern_call(fib_extern)
-                        .execute(code.ins, code.constants);
+                        let mut vm = VM::new(0, code.constants);
+                        vm.add_extern_call(fib_extern).execute(code.ins.as_slice());
                         println!("Ok Excution: {:?}", tmp.elapsed())
                     }
                     Err(e) => {

@@ -1,5 +1,8 @@
 pub mod vm_state;
 
+use std::collections::HashMap;
+
+use internment::Intern;
 use vm_state::VMState;
 
 use crate::{
@@ -19,26 +22,33 @@ pub struct VM {
     pub extern_fn: Vec<CallBack>,
     constants: Vec<VMData>,
     call_stack: Vec<usize>,
-    #[cfg(debug_assertions)]
-    fn_name: Vec<(String, usize)>,
+    hooks: HashMap<Intern<String>, usize>,
     pc: usize,
 }
 
 impl Default for VM {
     fn default() -> Self {
-        Self::new()
-    }
-}
-impl VM {
-    pub fn new() -> Self {
         Self {
-            stack: Stack::new(),
+            stack: Stack::default(),
             object_map: Memory::new(16),
             extern_fn: vec![],
             constants: vec![],
             call_stack: vec![],
-            #[cfg(debug_assertions)]
-            fn_name: vec![],
+            hooks: HashMap::default(),
+
+            pc: usize::default(),
+        }
+    }
+}
+impl VM {
+    pub fn new(mem_space: usize, constants: Vec<VMData>) -> Self {
+        Self {
+            stack: Stack::new(),
+            object_map: Memory::new(mem_space),
+            extern_fn: vec![],
+            constants,
+            call_stack: vec![],
+            hooks: HashMap::default(),
             pc: usize::default(),
         }
     }
@@ -52,13 +62,8 @@ impl VM {
         self.call_stack = vec![];
         self.pc = usize::default();
     }
-    #[cfg(debug_assertions)]
-    pub fn set_fn_name(&mut self, fn_name: Vec<(String, usize)>) -> &mut Self {
-        self.fn_name = fn_name;
-        self
-    }
-    pub fn execute(&mut self, ins: Vec<Instruction>, consts: Vec<VMData>) {
-        self.constants = consts;
+
+    pub fn execute(&mut self, ins: &[Instruction]) {
         while self.pc < ins.len() {
             let ins = &ins[self.pc];
             #[cfg(debug_assertions)]
@@ -71,11 +76,15 @@ impl VM {
                     self.execute_instruction(ins);
                 }
             }
-            //#[cfg(debug_assertions)]
-            //println!("{}", self.stack);
+            #[cfg(debug_assertions)]
+            println!("{}", self.stack);
 
-            //#[cfg(debug_assertions)]
-            //thread::sleep(Duration::from_millis(250));
+            #[cfg(debug_assertions)]
+            {
+                use std::thread;
+                use std::time::Duration;
+                thread::sleep(Duration::from_millis(250));
+            }
         }
         self.clean();
     }
@@ -219,14 +228,6 @@ impl VM {
             Call(address) => {
                 self.call_stack.push(self.pc + 1);
                 self.pc = address.into();
-                #[cfg(debug_assertions)]
-                {
-                    let name = self.fn_name.iter().find(|f| f.1 == address.into());
-                    match name {
-                        Some(n) => println!("call {}", n.0),
-                        None => panic!("Tf you calling?, {} in {:?}", self.pc, self.fn_name),
-                    }
-                }
                 return;
             }
             Ret => {

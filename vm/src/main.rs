@@ -37,13 +37,8 @@ fn main() {
                         println!("Ok Parser: {:?}", tmp.elapsed());
                         let tmp = std::time::Instant::now();
                         //code.clone().into_iter().for_each(|ins| println!("{:?}", ins));
-                        let mut vm = VM::new();
-                        #[cfg(debug_assertions)]
-                        println!("{:?}", code.fn_name);
-                        #[cfg(debug_assertions)]
-                        vm.set_fn_name(code.fn_name);
-                        vm.add_extern_call(fib_extern)
-                        .execute(code.ins, code.constants);
+                        let mut vm = VM::new(16, code.constants);
+                        vm.add_extern_call(fib_extern).execute(code.ins.as_slice());
                         println!("Ok Excution: {:?}", tmp.elapsed())
                     }
                     Err(e) => {
