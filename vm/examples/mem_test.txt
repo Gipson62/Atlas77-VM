@@ -1,5 +1,5 @@
 .section
-    @int i_max 40
+    @int i_max 1250
 .code
 main:
     push_i $0

@@ -4,7 +4,6 @@
 main:
     load_const #fib_number
     call &fib
-    print
     hlt
 fib:
     dup 

@@ -37,7 +37,7 @@ fn main() {
                         println!("Ok Parser: {:?}", tmp.elapsed());
                         let tmp = std::time::Instant::now();
                         //code.clone().into_iter().for_each(|ins| println!("{:?}", ins));
-                        let mut vm = VM::new(10, code.constants);
+                        let mut vm = VM::new(1, code.constants);
                         vm.add_extern_call(fib_extern).execute(code.ins.as_slice());
                         println!("{}", vm.object_map);
                         println!("Ok Excution: {:?}", tmp.elapsed())

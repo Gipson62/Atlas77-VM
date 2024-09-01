@@ -4,9 +4,9 @@ use vm::{instruction::compiler::parser::Parser, runtime::VM};
 fn vm_test_benchmark(c: &mut Criterion) {
     c.bench_function("vm_instruction", |b| {
         b.iter(|| {
-            if let Ok(content) = std::fs::read_to_string("./src/example.txt") {
+            if let Ok(content) = std::fs::read_to_string("./examples/fib.txt") {
                 let mut lexer = vm::instruction::compiler::lexer::AtlasLexer::default();
-                lexer.set_path("src/example.txt");
+                lexer.set_path("examples/fib.txt");
                 lexer.set_source(content);
                 lexer.add_system(vm::instruction::compiler::lexer::identifier_system);
                 lexer.add_system(vm::instruction::compiler::lexer::comment_system);

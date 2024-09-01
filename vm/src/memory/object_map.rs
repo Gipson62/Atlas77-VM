@@ -1,5 +1,7 @@
 use crate::memory::vm_data::VMData;
 
+use super::stack::Stack;
+
 #[derive(Debug)]
 pub struct Memory {
     mem: Vec<Object>,
@@ -35,7 +37,9 @@ impl std::fmt::Display for Memory {
 }
 
 impl Memory {
+    /// space should be at least 1
     pub(crate) fn new(space: usize) -> Self {
+        if space == 0 {panic!("The object_map should have 1 or more memory block at the start.")}
         Self {
             free: ObjectIndex::new(0),
             mem: (0..space)
@@ -74,7 +78,7 @@ impl Memory {
 
     fn grow(&mut self) {
         let current_size = self.mem.len();
-        let new_size = current_size + (current_size / 10);
+        let new_size = current_size + (current_size / 10) +1;
 
         self.mem.reserve(new_size - current_size);
         for i in current_size..new_size {
@@ -112,7 +116,7 @@ impl Memory {
 
     #[inline(always)]
     /// Return None if the ptr points to a free block and return the pointed object if not
-    pub(crate) fn free_struct(&mut self, index: ObjectIndex) -> Option<Object> {
+    pub(crate) fn free_obj(&mut self, index: ObjectIndex, stack: &mut Stack) -> Option<Object> {
         if let &Object::Free { next: _ } = self.get(index) {
             None
         } else {
@@ -120,8 +124,16 @@ impl Memory {
             let v = self.get_mut(index);
             let repl = std::mem::replace(v, new_free);
             self.free = index;
+            self.memory_pressure -= 1;
+            if self.memory_pressure < self.mem.len() / 2 {
+                self.shrink(stack)
+            }
             Some(repl)
         }
+    }
+    //Should be doing something, but for now it's too hard for my little brain.
+    fn shrink(&mut self, stack: &mut Stack) {
+
     }
 }
 
