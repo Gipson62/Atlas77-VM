@@ -1,5 +1,5 @@
 [package]
-name = "vm"
+name = "atlas_compiler"
 version = "0.1.0"
 edition = "2021"
 
@@ -17,12 +17,5 @@ codegen-units = 1
 
 [dependencies]
 atlas-core = "0.6.0-beta5"
-internment = "0.8.4"
-
-[dev-dependencies]
-criterion = "0.5.1"
-gnuplot = "0.0.43"
-
-[[bench]]
-name = "vm_benchmark"
-harness = false
+atlas_parser = { path = "./atlas_parser" }
+atlas_lexer = { path = "./atlas_lexer" }

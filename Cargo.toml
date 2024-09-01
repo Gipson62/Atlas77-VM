@@ -1,8 +1,10 @@
 [workspace]
 resolver = "1"
 members = [
-    "vm",
-    "atlas_frontend"
+    "atlas_vm",
+    "atlas_compiler",
+    "atlas_compiler/atlas_parser",
+    "atlas_compiler/atlas_lexer",
 ]
 
 [profile.bench]

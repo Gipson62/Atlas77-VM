@@ -1,15 +1,15 @@
-use vm::instruction::compiler::parser::Parser;
+use atlas_vm::instruction::compiler::parser::Parser;
 
-use vm::runtime::VM;
+use atlas_vm::runtime::VM;
 
 fn main() {
     let tmp = std::time::Instant::now();
     if let Ok(content) = std::fs::read_to_string("./vm/examples/mem_test.txt") {
-        let mut lexer = vm::instruction::compiler::lexer::AtlasLexer::default();
+        let mut lexer = atlas_vm::instruction::compiler::lexer::AtlasLexer::default();
         lexer.set_path("examples/mem_test.txt");
         lexer.set_source(content);
-        lexer.add_system(vm::instruction::compiler::lexer::identifier_system);
-        lexer.add_system(vm::instruction::compiler::lexer::comment_system);
+        lexer.add_system(atlas_vm::instruction::compiler::lexer::identifier_system);
+        lexer.add_system(atlas_vm::instruction::compiler::lexer::comment_system);
         let res = lexer.tokenize();
         match res {
             Ok(t) => {
