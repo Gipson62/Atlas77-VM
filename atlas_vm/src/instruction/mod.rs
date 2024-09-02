@@ -1,3 +1,6 @@
+// TODO: move all this "compiler" section in its own `atlas_bytecode` folder ig...
+// It'll be used by everything, so I'd love to avoid recursive stuff in dependencies
+
 use internment::Intern;
 
 pub mod compiler;

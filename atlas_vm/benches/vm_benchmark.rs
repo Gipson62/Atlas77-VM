@@ -1,5 +1,5 @@
-use criterion::{criterion_group, criterion_main, Criterion};
 use atlas_vm::{instruction::compiler::parser::Parser, runtime::VM};
+use criterion::{criterion_group, criterion_main, Criterion};
 
 fn vm_test_benchmark(c: &mut Criterion) {
     c.bench_function("vm_instruction", |b| {

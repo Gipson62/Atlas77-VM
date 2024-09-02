@@ -28,10 +28,13 @@ impl std::fmt::Display for ObjectIndex {
 
 impl std::fmt::Display for Memory {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "ObjectMap: [{}]",
-            self.mem.iter().map(|obj| {
-                obj.to_string()
-            }).collect::<String>()
+        write!(
+            f,
+            "ObjectMap: [{}]",
+            self.mem
+                .iter()
+                .map(|obj| { obj.to_string() })
+                .collect::<String>()
         )
     }
 }
@@ -39,7 +42,9 @@ impl std::fmt::Display for Memory {
 impl Memory {
     /// space should be at least 1
     pub(crate) fn new(space: usize) -> Self {
-        if space == 0 {panic!("The object_map should have 1 or more memory block at the start.")}
+        if space == 0 {
+            panic!("The object_map should have 1 or more memory block at the start.")
+        }
         Self {
             free: ObjectIndex::new(0),
             mem: (0..space)
@@ -78,7 +83,7 @@ impl Memory {
 
     fn grow(&mut self) {
         let current_size = self.mem.len();
-        let new_size = current_size + (current_size / 10) +1;
+        let new_size = current_size + (current_size / 10) + 1;
 
         self.mem.reserve(new_size - current_size);
         for i in current_size..new_size {
@@ -132,9 +137,7 @@ impl Memory {
         }
     }
     //Should be doing something, but for now it's too hard for my little brain.
-    fn shrink(&mut self, stack: &mut Stack) {
-
-    }
+    fn shrink(&mut self, stack: &mut Stack) {}
 }
 
 #[derive(Clone, Debug)]
@@ -146,23 +149,25 @@ pub enum Object {
 
 impl std::fmt::Display for Object {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", match self {
-            Object::String(s) => {
-                format!("String: {}", s)
-            },
-            Object::Structure(s) => {
-                format!("Structure: {{ {} }}", {
-                    let mut str_ = String::new();
-                    s.fields.iter().for_each(|f| {
-                        str_.push_str(&f.to_string())
-                    });
-                    str_
-                })
+        write!(
+            f,
+            "{}",
+            match self {
+                Object::String(s) => {
+                    format!("String: {}", s)
+                }
+                Object::Structure(s) => {
+                    format!("Structure: {{ {} }}", {
+                        let mut str_ = String::new();
+                        s.fields.iter().for_each(|f| str_.push_str(&f.to_string()));
+                        str_
+                    })
+                }
+                Object::Free { next } => {
+                    format!("Free: {}", next)
+                }
             }
-            Object::Free { next } => {
-                format!("Free: {}", next)
-            }
-        })
+        )
     }
 }
 
