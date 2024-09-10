@@ -5,21 +5,25 @@ use atlas_vm::runtime::vm_state::VMState;
 use atlas_vm::runtime::VM;
 
 fn main() {
-    // std::env::set_var("RUST_BACKTRACE", "1");
-    /*let mut tmp = Duration::new(0, 0);
-    let mut stack_machine = VM::new();
-    let ins = vec![];
-    for _ in 0..TEST_AMOUNT {
-        use std::time;
-        let ins = ins.clone();
-        let instant = time::Instant::now();
-        stack_machine.execute(ins);
-        tmp += instant.elapsed();
-        stack_machine.clean();
+    if let Ok(content) = std::fs::read_to_string("./examples/test.atlas") {
+        let mut lexer = atlas_lexer::AtlasLexer::default();
+        lexer
+            .set_path("./examples/test.atlas")
+            .set_source(content)
+            .add_system(atlas_lexer::identifier_system)
+            .add_system(atlas_lexer::string_literal_system);
+        let res = lexer.tokenize();
+        match res {
+            Ok(t) => {
+                println!("{t:?}")
+            }
+            Err(_) => {
+                println!("Error...")
+            }
+        }
     }
-    println!("tmp1: {:?}", tmp.div_f32(TEST_AMOUNT as f32));*/
-    let tmp = std::time::Instant::now();
-    if let Ok(content) = std::fs::read_to_string("./vm/examples/mem_test.txt") {
+    /*let tmp = std::time::Instant::now();
+    if let Ok(content) = std::fs::read_to_string("./atlas_vm/examples/mem_test.txt") {
         let mut lexer = atlas_vm::instruction::compiler::lexer::AtlasLexer::default();
         lexer.set_path("examples/mem_test.txt");
         lexer.set_source(content);
@@ -53,7 +57,7 @@ fn main() {
         }
     } else {
         println!("Error2")
-    }
+    }*/
 }
 
 pub fn fib_extern(vm_state: VMState) -> Result<VMData, ()> {

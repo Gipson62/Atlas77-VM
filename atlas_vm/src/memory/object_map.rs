@@ -1,6 +1,6 @@
 use crate::memory::vm_data::VMData;
 
-use super::stack::Stack;
+use super::{stack::Stack, vm_data::TAG};
 
 #[derive(Debug)]
 pub struct Memory {
@@ -137,13 +137,15 @@ impl Memory {
         }
     }
     //Should be doing something, but for now it's too hard for my little brain.
-    fn shrink(&mut self, stack: &mut Stack) {}
+    fn shrink(&mut self, _stack: &mut Stack) {}
 }
 
 #[derive(Clone, Debug)]
 pub enum Object {
     String(String),
     Structure(Structure),
+    Class(Class),
+    Vector(Vector),
     Free { next: ObjectIndex },
 }
 
@@ -160,6 +162,20 @@ impl std::fmt::Display for Object {
                     format!("Structure: {{ {} }}", {
                         let mut str_ = String::new();
                         s.fields.iter().for_each(|f| str_.push_str(&f.to_string()));
+                        str_
+                    })
+                }
+                Object::Class(c) => {
+                    format!("Class {{ {} }}", {
+                        let mut str_ = String::new();
+                        c.fields.iter().for_each(|f| str_.push_str(&f.to_string()));
+                        str_
+                    })
+                }
+                Object::Vector(v) => {
+                    format!("Vector [{}]", {
+                        let mut str_ = String::new();
+                        v.vec.iter().for_each(|f| str_.push_str(&f.to_string()));
                         str_
                     })
                 }
@@ -203,6 +219,34 @@ impl Object {
             _ => unreachable!(),
         }
     }
+
+    pub fn class(&self) -> &Class {
+        match self {
+            Object::Class(c) => c,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn class_mut(&mut self) -> &mut Class {
+        match self {
+            Object::Class(c) => c,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn vector(&self) -> &Vector {
+        match self {
+            Object::Vector(v) => v,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn vector_mut(&mut self) -> &mut Vector {
+        match self {
+            Object::Vector(v) => v,
+            _ => unreachable!(),
+        }
+    }
 }
 
 impl From<Structure> for Object {
@@ -217,7 +261,33 @@ impl From<String> for Object {
     }
 }
 
+impl From<Class> for Object {
+    fn from(value: Class) -> Self {
+        Object::Class(value)
+    }
+}
+
+impl From<Vector> for Object {
+    fn from(value: Vector) -> Self {
+        Object::Vector(value)
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct Structure {
     pub fields: Vec<VMData>,
+}
+
+#[derive(Clone, Debug)]
+///This should have a VTable
+pub struct Class {
+    pub prototype: Option<Box<Class>>,
+    pub fields: Vec<VMData>,
+}
+
+#[derive(Clone, Debug)]
+pub struct Vector {
+    pub vec: Vec<VMData>,
+    ///To know what's the type of the value in the Vec and ensure everything works correctly
+    pub tag: TAG,
 }

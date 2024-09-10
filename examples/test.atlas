@@ -1,8 +1,37 @@
-public struct Position {
+import std::IO;
+
+public trait Prototype {
     public:
-        float x,
+        function clone(&self) -> Self;
+}
+
+class Person implements Prototype {
     public:
-        float y,
+        string first_name;
+        string name;
+        
+    private:
+        u32 iq;
+
     public:
-        float z,
+    function get_full_name(&self) -> string {
+        return first_name + self.name;
+    }
+    function clone(&self) -> Self {
+        Person {
+            first_name: self.first_name,
+            name: self.name,
+            iq: self.iq
+        }
+    }
+}
+
+struct Position {
+    x: f32,
+    y: f32,
+    z: f32,
+}
+
+function main() {
+    print("Hello World!");
 }

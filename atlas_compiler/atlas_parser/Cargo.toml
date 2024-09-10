@@ -16,5 +16,6 @@ opt-level = 3
 codegen-units = 1
 
 [dependencies]
-atlas-core = "0.6.0-beta5"
 internment = "0.8.4"
+atlas_lexer = {path = "../atlas_lexer"}
+atlas_common = { path = "../../atlas_common" }

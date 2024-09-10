@@ -2,6 +2,8 @@ use std::fmt::Display;
 
 use super::object_map::ObjectIndex;
 
+pub type TAG = u64;
+
 #[derive(Clone, Copy)]
 pub union RawVMData {
     as_unit: (),
@@ -15,7 +17,7 @@ pub union RawVMData {
 
 #[derive(Clone, Copy)]
 pub struct VMData {
-    pub tag: u64,
+    pub tag: TAG,
     data: RawVMData,
 }
 
@@ -29,15 +31,15 @@ macro_rules! def_new_vmdata_func {
 }
 
 impl VMData {
-    pub const TAG_UNIT: u64 = 0;
-    pub const TAG_U64: u64 = 4;
-    pub const TAG_I64: u64 = 8;
-    pub const TAG_FLOAT: u64 = 9;
-    pub const TAG_BOOL: u64 = 10;
-    pub const TAG_STR: u64 = 11;
-    pub const TAG_CHAR: u64 = 12;
+    pub const TAG_UNIT: TAG = 0;
+    pub const TAG_U64: TAG = 4;
+    pub const TAG_I64: TAG = 8;
+    pub const TAG_FLOAT: TAG = 9;
+    pub const TAG_BOOL: TAG = 10;
+    pub const TAG_STR: TAG = 11;
+    pub const TAG_CHAR: TAG = 12;
 
-    pub fn new(tag: u64, data: RawVMData) -> Self {
+    pub fn new(tag: TAG, data: RawVMData) -> Self {
         Self { tag, data }
     }
 
@@ -48,7 +50,7 @@ impl VMData {
         }
     }
 
-    pub fn new_object(tag: u64, val: ObjectIndex) -> Self {
+    pub fn new_object(tag: TAG, val: ObjectIndex) -> Self {
         assert!(tag > 256, "object typeid is within the reserved area");
         Self {
             tag,
