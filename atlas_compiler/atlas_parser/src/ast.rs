@@ -1,6 +1,8 @@
 use atlas_lexer::{Token, TokenKind};
 use internment::Intern;
 
+use crate::class::ClassDeclaration;
+
 #[repr(u8)]
 pub enum Visibility {
     Private,
@@ -12,9 +14,7 @@ pub enum Declaration {
     StructDeclaration {
         name: Intern<String>,
     },
-    ClassDeclaration {
-        name: Intern<String>,
-    },
+    ClassDeclaration(ClassDeclaration),
     ImportDeclaration {
         ///std::collection::string => ["std", "collection", "string"]
         path: Vec<Intern<String>>,

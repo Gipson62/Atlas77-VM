@@ -4,6 +4,7 @@ use internment::Intern;
 
 pub struct ClassDeclaration {
     pub name: Intern<String>,
+    pub fields: Vec<ClassField>,
 }
 
 pub struct ClassField {

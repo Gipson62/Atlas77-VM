@@ -16,4 +16,5 @@ pub enum DataType {
     Bool,
     Struct(Intern<String>, Arc<[DataType]>),
     Class(Intern<String>, Arc<[DataType]>),
+    Enum(Intern<String>, Arc<[Intern<String>]>),
 }

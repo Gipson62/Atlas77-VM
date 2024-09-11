@@ -17,5 +17,5 @@ codegen-units = 1
 
 [dependencies]
 internment = "0.8.4"
-atlas_lexer = {path = "../atlas_lexer"}
+atlas_lexer = { path = "../atlas_lexer" }
 atlas_common = { path = "../../atlas_common" }

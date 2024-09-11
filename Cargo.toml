@@ -5,7 +5,6 @@ members = [
     "atlas_compiler",
     "atlas_compiler/atlas_parser",
     "atlas_compiler/atlas_lexer",
-    "atlas_common"
 ]
 
 [profile.bench]
