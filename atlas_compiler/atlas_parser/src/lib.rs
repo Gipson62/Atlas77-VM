@@ -1,4 +1,4 @@
-use ast::Declaration;
+use ast::{Declaration, FunctionDeclaration};
 use atlas_core::utils::span::Spanned;
 use atlas_lexer::{Literal, Token, TokenKind};
 use internment::Intern;
@@ -29,9 +29,30 @@ pub fn parse(file: &'static str, tokens: Vec<Token>) -> Result<Vec<Declaration>,
             break;
         }
         let start_pos = parser.current_token().start();
+        match parser.current_kind() {
+            TokenKind::Keyword(k) => match k.as_str() {
+                "function" => {
+                    let _ = parser.advance();
+                    
+                }
+                "class" => {}
+                "public" => {}
+                "private" => {}
+                "interface" => {}
+                "struct" => {}
+                "import" => {}
+                "enum" => {}
+                _ => {}
+            },
+            _ => {}
+        }
     }
 
     Ok(vec)
+}
+
+fn parse_function(parser: &mut Parser) -> FunctionDeclaration {
+    todo!()
 }
 
 impl Parser {
