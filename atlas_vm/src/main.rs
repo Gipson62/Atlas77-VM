@@ -5,24 +5,7 @@ use atlas_vm::runtime::vm_state::VMState;
 use atlas_vm::runtime::VM;
 
 fn main() {
-    if let Ok(content) = std::fs::read_to_string("./examples/test.atlas") {
-        let mut lexer = atlas_lexer::AtlasLexer::default();
-        lexer
-            .set_path("./examples/test.atlas")
-            .set_source(content)
-            .add_system(atlas_lexer::identifier_system)
-            .add_system(atlas_lexer::string_literal_system);
-        let res = lexer.tokenize();
-        match res {
-            Ok(t) => {
-                println!("{t:?}")
-            }
-            Err(_) => {
-                println!("Error...")
-            }
-        }
-    }
-    /*let tmp = std::time::Instant::now();
+let tmp = std::time::Instant::now();
     if let Ok(content) = std::fs::read_to_string("./atlas_vm/examples/mem_test.txt") {
         let mut lexer = atlas_vm::instruction::compiler::lexer::AtlasLexer::default();
         lexer.set_path("examples/mem_test.txt");
@@ -57,7 +40,7 @@ fn main() {
         }
     } else {
         println!("Error2")
-    }*/
+    }
 }
 
 pub fn fib_extern(vm_state: VMState) -> Result<VMData, ()> {

@@ -1,0 +1,20 @@
+use std::str::FromStr;
+use crate::prelude::*;
+
+grammar;
+
+pub Term: Num = {
+    <f:Float> => Num::Floating(f),
+    <i:Int> => Num::Integer(i),
+    "(" <t:Term> ")" => t,
+};
+
+Float: f64 = {
+    <i1:Int> "." <i2:Int> => {
+        let mut s = i1.to_string();
+        s.push('.');
+        s.push_str(&i2.to_string());
+        f64::from_str(&s).unwrap()
+    }
+};
+Int: i64 = <s:r"[0-9]+"> => i64::from_str(s).unwrap();

@@ -11,12 +11,16 @@ codegen-units = 1
 overflow-checks = false
 debug-assertions = false
 strip = "debuginfo"
+
 [profile.release.package."*"]
 opt-level = 3
 codegen-units = 1
 
 [dependencies]
 internment = "0.8.4"
-atlas_lexer = { path = "../atlas_lexer" }
 atlas_common = { path = "../../atlas_common" }
 atlas-core = "0.6.0-beta5"
+lalrpop-util = "0.21.0"
+
+[build-dependencies]
+lalrpop = "0.21.0"
